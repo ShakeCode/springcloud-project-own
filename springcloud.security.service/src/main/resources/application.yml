@@ -1,0 +1,33 @@
+server:
+  port: 8060
+
+#应用名称
+spring:
+  application:
+    name: springcloud.security.service
+  datasource:
+    url: jdbc:mysql://127.0.0.1:5306/app_oauth?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+
+# 安全认证的配置
+security:
+  basic:
+    enabled: true
+
+eureka:
+  #客户端
+  client:
+    #注册中心地址
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:8091/eureka,http://${eureka.instance.hostname}:8099/eureka
+  instance:
+    hostname: 127.0.0.1
+    # 远程调用是否返回IP,默认false
+    prefer-ip-address: false
+
+rsa:
+  key:
+    pubKeyFile: classpath:auth_key/id_key_rsa.pub
+    priKeyFile: classpath:auth_key/id_key_rsa

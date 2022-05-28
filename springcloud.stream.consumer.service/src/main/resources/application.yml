@@ -1,0 +1,55 @@
+server:
+  port: 8099
+  servlet:
+    context-path: /stream/comsumer
+
+
+# 指定当前eureka客户端的注册地址，也就是eureka服务的提供方，当前配置的服务的注册服务方
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:8091/eureka,http://${eureka.instance.hostname}:8099/eureka
+    #是否将自己注册到Eureka Server上，默认为true
+    register-with-eureka: true
+    #是否从Eureka Server上获取注册信息，默认为true
+    fetch-registry: true
+  instance:
+    hostname: 127.0.0.1
+    prefer-ip-address: true
+
+#指定应用名称
+spring:
+  application:
+    name: springcloud-stream-comsumer
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  cloud:
+    stream:
+      bindings:
+        # 通道名称,与@StreamListener 监听通道保持一致
+        myInput:
+          #目的地
+          destination: msg-stream-io
+          #分组
+          group: ${spring.application.name}
+          consumer:
+            #重试机制, 默认3次
+            maxAttempts: 4
+
+      rabbit:
+        bindings:
+          myInput:
+            consumer:
+              #消息处理失败后进入死信队列
+              autoBindDlq: true
+              #默认是false,如果设置为true,将会把消息的头信息(包括异常消息和stack trace)一起加入到dlq队列中
+              republishToDlq: true
+              #设置死信队列消息存放时间，默认没有限制，如果设置，可能发生消息丢失
+              dlqTtl: 86400000
+
+
+

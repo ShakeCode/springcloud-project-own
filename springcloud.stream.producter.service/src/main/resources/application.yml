@@ -1,0 +1,36 @@
+server:
+  port: 8098
+  servlet:
+    context-path: /stream/producer
+
+# 指定当前eureka客户端的注册地址，也就是eureka服务的提供方，当前配置的服务的注册服务方
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:8091/eureka,http://${eureka.instance.hostname}:8099/eureka
+    #是否将自己注册到Eureka Server上，默认为 true
+    register-with-eureka: false
+    #是否从Eureka Server上获取注册信息，默认为 true
+    fetch-registry: false
+  instance:
+    hostname: 127.0.0.1
+    # 远程调用是否返回IP,默认false
+    prefer-ip-address: false
+
+#指定应用名称
+spring:
+  application:
+    name: springcloud-stream-producer
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  cloud:
+    stream:
+      bindings:
+        #通道名称，与@Output 输出通道保持一致
+        myOutput:
+          #目的地 交换机名称，默认TOPIC类型
+          destination: msg-stream-io

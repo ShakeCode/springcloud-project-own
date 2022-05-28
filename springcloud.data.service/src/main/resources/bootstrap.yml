@@ -1,0 +1,58 @@
+server:
+  port: 8092
+  servlet:
+    context-path: /data
+
+# 指定当前eureka客户端的注册地址
+eureka:
+  client:
+    #(服务的提供者是需要注册到注册中心的) 默认就是true
+    register-with-eureka: true
+    service-url:
+      #配置高可用eureka服务地址
+      defaultZone: http://${eureka.instance.hostname}:8091/eureka,http://${eureka.instance.hostname}:8099/eureka
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+
+
+#引入配置中心判断使用的远程配置文件
+spring:
+  #当前服务名称
+  application:
+    name: eureka-data-service
+  zipkin:
+    base-url: http://localhost:9411
+  sleuth:
+    sampler:
+      # 采样率值介于0到1之间，1表示全部采集
+      probability: 1
+  cloud:
+    config:
+      # 获取配置文件的名称
+      name: springcloud-data-service
+      # 配置的策略pro-生产 test-测试 dev-开发
+      profile: dev
+      # git/svn的仓库分支,使用本地配置时不需要配置
+      label: master
+      discovery:
+        # 开启配置信息发现
+        enabled: true
+        # 指定配置中心的service-id(应用名称)
+        service-id: springcloud-config-server
+    bus:
+      trace:
+        ## 开启消息跟踪
+        enabled: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+#配置动态刷新[动态刷新是当远程配置文件修改后，客户端获取的配置能够实时刷新]
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,health

@@ -1,0 +1,65 @@
+server:
+  port: 8077
+
+#应用名称
+spring:
+  application:
+    name: springcloud.geteway.service
+
+zuul:
+  routes:
+    #访问/v1/product时,转发到本地方法, 测试: http://127.0.0.1:8077/grid/v1/data/info?token=1
+    local:
+      path: /v1/data/**
+      url: forward:/v1/product
+    #转发的服务名称
+    data-service:
+      #代理路径
+      path: /data-service/**
+      #被代理服务名称, 使用注册到eureka的服务名, 此时访问接口可使用: http://127.0.0.1:8077/data-service/v1/data/info
+      serviceId: eureka-data-service
+  # 代理前缀, 此时服务访问带上/grid (http://127.0.0.1:8077/grid/data-service/v1/data/info?token=1)
+  prefix: /grid
+  #是否开启前缀
+  stripPrefix: true
+  # 需要忽略的服务
+  ignored-services: eureka-common-service
+  #屏蔽掉代理路径
+  ignored-patterns: /v1/person/**
+  #未传递给下游请求的敏感报头列表
+  sensitive-headers: cookie,header
+  #完全忽略的HTTP报头的名称(即不让它们出现在下游请求中，并从下游响应中删除它们)
+  ignored-headers: tenant-code
+
+
+hystrix:
+  command:
+    eureka-data-service:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 1000
+
+ribbon:
+  eureka:
+    enabled: false
+
+eureka-data-service:
+  ribbon:
+    NIWSServerListClassName: com.netflix.loadbalancer.ConfigurationBasedServerList
+    listOfServers: http://example1.com,http://example2.com
+    ConnectTimeout: 1000
+    ReadTimeout: 3000
+    MaxTotalHttpConnections: 500
+    MaxConnectionsPerHost: 100
+
+eureka:
+  #客户端
+  client:
+    #注册中心地址
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:8091/eureka,http://${eureka.instance.hostname}:8099/eureka
+  instance:
+    hostname: 127.0.0.1
+    # 远程调用是否返回IP,默认false
+    prefer-ip-address: false

@@ -1,0 +1,31 @@
+server:
+  port: 8091
+  servlet:
+    context-path: /eureka/server
+
+# 指定当前eureka客户端的注册地址，也就是eureka服务的提供方，当前配置的服务的注册服务方
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
+    #自身 不在向eureka注册
+    register-with-eureka: true
+    #启动时禁用client的注册
+    fetch-registry: false
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    server:
+      enable-self-preservation: false #（默认true；此处设为false，关闭自我保护机制，主动剔除故障的节点）
+      eviction-interval-timer-in-ms: 5000
+
+#指定应用名称
+spring:
+  application:
+    name: eureka-server
+  zipkin:
+    base-url: http://localhost:9411
+  sleuth:
+    sampler:
+      # 采样率值介于0到1之间，1表示全部采集
+      probability: 1
